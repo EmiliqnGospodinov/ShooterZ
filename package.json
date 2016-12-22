@@ -12,5 +12,14 @@
   },
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "My first multiplayer browser game.\r $ cd ShooterZ\r $ node app.js\r > go to localhost:2000 in your browser",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EmiliqnGospodinov/ShooterZ.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/EmiliqnGospodinov/ShooterZ/issues"
+  },
+  "homepage": "https://github.com/EmiliqnGospodinov/ShooterZ#readme"
 }
