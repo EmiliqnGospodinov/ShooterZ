@@ -7,7 +7,11 @@ app.get('/', function(req, res){
   res.sendFile(__dirname+'/client/index.html');
 });
 
+<<<<<<< HEAD
 serv.listen(process.env.PORT || 2000);
+=======
+serv.listen(process.env.PORT || 5000);
+>>>>>>> 745feb35f0e8f5acfec3bfc852225febb9ff07b1
 console.log("Server started.");
 var SOCKET_LIST = {};
 
