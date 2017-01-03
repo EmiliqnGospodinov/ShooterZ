@@ -8,12 +8,12 @@
     var socket = io();
 
     socket.on('newPositions',function(data){
-        ctx.clearRect(0,0,500,500);
-        for(var i = 0 ; i < data.length; i++){
-            ctx.fillText(data[i].number,data[i].x-4,data[i].y+5);
-            ctx.beginPath();
-            ctx.arc(data[i].x,data[i].y,30,0,2*Math.PI);//x,y, radius, cut
-            ctx.stroke();
+      ctx.clearRect(0,0,ctx.width,ctx.height);
+      for(var i = 0 ; i < data.length; i++){
+          ctx.fillText(data[i].number,data[i].x-4,data[i].y+5);//center the name
+          ctx.beginPath();
+          ctx.arc(data[i].x,data[i].y,30,0,2*Math.PI);//x,y, radius, cut
+          ctx.stroke();
       }
     });
 
