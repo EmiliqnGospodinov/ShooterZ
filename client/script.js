@@ -1,7 +1,56 @@
+var socket = io();
+//divs
+var signUpDiv = document.getElementById('signUpDiv');
+var signInDiv = document.getElementById('signInDiv');
+//sign in elements
+var signInDivUsername = document.getElementById('signInDiv-username');
+var signInDivPassword = document.getElementById('signInDiv-password');
+var signInDivSignIn = document.getElementById('signInDiv-signIn');
+var signInDivSignUp = document.getElementById('signInDiv-signUp');
+
+//sign up elements
+var signUpDivUsername = document.getElementById('signUpDiv-username');
+var signUpDivPassword = document.getElementById('signUpDiv-password');
+var signUpDivSignUp = document.getElementById('signUp');
+
+//sing in functions
+signInDivSignIn.onclick = function(){
+  socket.emit('signIn',{username:signInDivUsername.value,password:signInDivPassword.value});
+}
+signInDivSignUp.onclick = function(){
+  signInDiv.style.display = 'none';
+  signUpDiv.style.display = 'block';
+}
+signUpDivSignUp.onclick = function(){
+  signInDiv.style.display = 'none';
+  signUpDiv.style.display = 'block';
+}
+socket.on('signInResponse',function(data){
+    if(data.success){
+        signInDiv.style.display = 'none';
+        gameDiv.style.display = 'block';
+    } else
+        alert("Sign in unsuccessful.");
+});
+
+//sing in functions
+signUpDivSignUp.onclick = function(){
+  socket.emit('signUp',{username:signUpDivUsername.value,password:signUpDivPassword.value});
+}
+socket.on('signUpResponse',function(data){
+    if(data.success){
+        signUpDiv.style.display = 'none';
+        signInDiv.style.display = 'block';
+        alert("Sign up successful, please log in");
+    } else
+        alert("Sign up unsuccessful.");
+});
+
+
+//game
 var ctx = document.getElementById("ctx").getContext("2d");
 ctx.font = '15px Arial';
 var cradius = 30;
-var socket = io();
 var playerx,playery;
 
 socket.on('newPositions',function(data){
