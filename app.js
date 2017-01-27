@@ -3,6 +3,10 @@ var app = express();
 app.use('/client', express.static(__dirname + '/client'));
 var serv = require('http').Server(app);
 
+// db
+var mongojs = require('mongojs');
+var db = mongojs('mongodb://decisioner:gs4k56al12@ds117199.mlab.com:17199/shooterzdb', ['account','progress']);
+
 app.get('/', function(req, res){
   res.sendFile(__dirname+'/client/index.html');
 });
@@ -159,26 +163,30 @@ Bullet.update = function(){
 
 var USERS = {
   //username:password
-  "deci":"123",
   "name":"pass",
   "asd":"asd"
 }
 
-var isValidPassword = function(data,callback){
-  setTimeout(function(){
-    callback(USERS[data.username] === data.password);
-  },10);
+var isValidPassword = function(data,cb){
+    db.account.find({username:data.username,password:data.password},function(err,res){
+        if(res.length > 0)
+            cb(true);
+        else
+            cb(false);
+    });
 }
-var isUsernameTaken = function(data,callback){
-  setTimeout(function(){
-    callback(USERS[data.username]);
-  },10);
+var isUsernameTaken = function(data,cb){
+    db.account.find({username:data.username},function(err,res){
+        if(res.length > 0)
+            cb(true);
+        else
+            cb(false);
+    });
 }
-var addUser = function(data,callback){
-  setTimeout(function(){
-    USERS[data.username] = data.password;
-    callback();
-  },10);
+var addUser = function(data,cb){
+    db.account.insert({username:data.username,password:data.password},function(err){
+        cb();
+    });
 }
 
 var io = require('socket.io')(serv,{});
