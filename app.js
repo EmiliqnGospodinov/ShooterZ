@@ -16,8 +16,8 @@ var SOCKET_LIST = {};
 
 var Entity = function(){
   var self = {
-    x:250,
-    y:250,
+    x:Math.random() * (470 - 30) + 30,
+    y:Math.random() * (470 - 30) + 30,
     spdX:0,
     spdY:0,
     id:"",
@@ -47,6 +47,9 @@ var Player = function(id){
   self.pressingAttack = false;
   self.mouseAngle = 0;
   self.maxSpd = 10;
+  self.hp = 10;
+  self.hpMax = 10;
+  self.score = 0;
 
   var super_update = self.update;
   self.update = function(){
@@ -56,39 +59,55 @@ var Player = function(id){
       self.shootBullet(self.mouseAngle);
     }
   }
-
-
-  self.updateSpd = function(){
-    if(self.pressingRight && self.x < 470)
-      self.spdX = self.maxSpd;
-    else if(self.pressingLeft && self.x > 30)
-      self.spdX = -self.maxSpd;
-    else
-      self.spdX = 0;
-
-    if(self.pressingUp && self.y > 30)
-      self.spdY = -self.maxSpd;
-    else if(self.pressingDown && self.y < 470)
-      self.spdY = self.maxSpd;
-    else
-      self.spdY = 0;
-  }
-
   self.shootBullet = function(angle){
     var b = Bullet(self.id,angle);
     b.x = self.x;
     b.y = self.y;
   }
+
+  self.updateSpd = function(){
+    if(self.pressingRight && self.x < 466)// ???? number
+      self.spdX = self.maxSpd;
+    else if(self.pressingLeft && self.x > 34)// ???? number
+      self.spdX = -self.maxSpd;
+    else
+      self.spdX = 0;
+
+    if(self.pressingUp && self.y > 34)// ???? number
+      self.spdY = -self.maxSpd;
+    else if(self.pressingDown && self.y < 466)// ???? number
+      self.spdY = self.maxSpd;
+    else
+      self.spdY = 0;
+  }
+
+  self.getInitPack = function(){
+    return{
+      id:self.id,
+      x:self.x,
+      y:self.y,
+      number:self.number,
+      hp:self.hp,
+      hpMax:self.hpMax,
+      score:self.score,
+    };
+  }
+  self.getUpdatePack = function(){
+    return{
+      id:self.id,
+      x:self.x,
+      y:self.y,
+      hp:self.hp,
+      score:self.score,
+    };
+  }
+
   Player.list[id] = self;
-  initPack.player.push({
-    id:self.id,
-    x:self.x,
-    y:self.y,
-    number:self.number,
-  });
+  initPack.player.push(self.getInitPack());
   return self;
 }
 Player.list = {};
+
 Player.onConnect = function(socket){
   var player = Player(socket.id);
   socket.on('keyPress',function(data){
@@ -105,6 +124,18 @@ Player.onConnect = function(socket){
     else if(data.inputId === 'mouseAngle')
       player.mouseAngle = data.state;
   });
+
+  socket.emit('init',{
+    player:Player.getAllInitPack(),
+    bullet:Bullet.getAllInitPack(),
+  })
+}
+Player.getAllInitPack = function(){
+  var players = [];
+  for(var i in Player.list){
+    players.push(Player.list[i].getInitPack());
+  }
+  return players;
 }
 
 Player.onDisconnect = function(socket){
@@ -116,11 +147,7 @@ Player.update = function(){
   for(var i in Player.list){
     var player = Player.list[i];
     player.update();
-    pack.push({
-      id:player.id,
-      x:player.x,
-      y:player.y,
-    });
+    pack.push(player.getUpdatePack());
   }
   return pack;
 }
@@ -141,17 +168,35 @@ var Bullet = function(parent, angle){
       for(var i in Player.list){
         var p = Player.list[i];
         if(self.getDistance(p) < 32 && self.parent !== p.id){
-          //handle collision. ex: hp--;
+          p.hp -= 1;
+          if(p.hp <= 0) {
+            var shooter = Player.list[self.parent];
+            if(shooter)
+              shooter.score += 1;
+            p.hp = p.hpMax;
+            p.x = Math.random() * (470 - 30) + 30;
+            p.y = Math.random() * (470 - 30) + 30;
+          }
           self.toRemove = true;
         }
       }
   }
+  self.getInitPack = function(){
+    return{
+      id:self.id,
+      x:self.x,
+      y:self.y,
+    };
+  }
+  self.getUpdatePack = function(){
+    return{
+      id:self.id,
+      x:self.x,
+      y:self.y,
+    };
+  }
   Bullet.list[self.id] = self;
-  initPack.bullet.push({
-    id:self.id,
-    x:self.x,
-    y:self.y,
-  });
+  initPack.bullet.push(self.getInitPack());
   return self;
 }
 Bullet.list = {};
@@ -165,20 +210,17 @@ Bullet.update = function(){
       delete Bullet.list[i];
       removePack.bullet.push(bullet.id);
     }else{
-      pack.push({
-        id:bullet.id,
-        x:bullet.x,
-        y:bullet.y,
-      });
+      pack.push(bullet.getUpdatePack());
     }
   }
   return pack;
 }
-
-var USERS = {
-  //username:password
-  "name":"pass",
-  "asd":"asd"
+Bullet.getAllInitPack = function(){
+  var bullets = [];
+  for(var i in Bullet.list){
+    bullets.push(Bullet.list[i].getInitPack());
+  }
+  return bullets;
 }
 
 var isValidPassword = function(data,cb){
@@ -246,7 +288,7 @@ setInterval(function(){
     player:Player.update(),
     bullet:Bullet.update(),
   }
- 
+
   for(var i in SOCKET_LIST){
     var socket = SOCKET_LIST[i];
     socket.emit('init',initPack);

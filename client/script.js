@@ -60,6 +60,22 @@ var Player = function(initPack){
   self.number = initPack.number;
   self.x = initPack.x;
   self.y = initPack.y;
+  self.hp = initPack.hp;
+  self.hpMax = initPack.hpMax;
+  self.score = initPack.score;
+
+  self.draw = function(){
+    var hpWidth = 30* self.hp/ self.hpMax;
+    ctx.fillRect(self.x - hpWidth/2,self.y - 40, hpWidth, 4);
+    ctx.fillText(self.score,self.x,self.y - 60);
+    ctx.fillText(self.number,self.x-4,self.y+5);//center the name
+    ctx.beginPath();
+    ctx.arc(self.x,self.y,cradius,0,2*Math.PI);//x,y, radius, cut
+    ctx.stroke();
+    playerx = self.x;
+    playery = self.y;
+  }
+
   Player.list[self.id] = self;
   return self;
 }
@@ -70,6 +86,10 @@ var Bullet = function(initPack){
   self.id = initPack.id;
   self.x = initPack.x;
   self.y = initPack.y;
+  self.draw = function(){
+    ctx.fillRect(self.x-5,self.y-5,5,5);//center the bullet
+  }
+
   Bullet.list[self.id] = self;
   return self;
 }
@@ -95,6 +115,10 @@ socket.on('update',function(data){
         p.x = pack.x;
       if(pack.y !== undefined)
         p.y = pack.y;
+      if(pack.hp !== undefined)
+        p.hp = pack.hp;
+      if(pack.score !== undefined)
+        p.score = pack.score;
     }
   }
   for(var i = 0 ; i < data.bullet.length; i++){
@@ -119,16 +143,11 @@ socket.on('remove',function(data){
 })
 
 setInterval(function(){
-  ctx.clearRect(0,0,500,500);
+  ctx.clearRect(0,0,document.getElementById("ctx").width,document.getElementById("ctx").height);
   for(var i in Player.list)
-    ctx.fillText(Player.list[i].number,Player.list[i].x-5,Player.list[i].y+5);//center the name
-    ctx.beginPath();
-    ctx.arc(Player.list[i].x,Player.list[i].y,cradius,0,2*Math.PI);//x,y, radius, cut
-    ctx.stroke();
-    playerx = Player.list[i].x;
-    playery = Player.list[i].y;
+    Player.list[i].draw();
   for(var i in Bullet.list)
-      ctx.fillRect(Bullet.list[i].x-5,Bullet.list[i].y-5,5,5);//center the bullet
+    Bullet.list[i].draw();
 },40);
 
 document.onkeydown = function(event){
