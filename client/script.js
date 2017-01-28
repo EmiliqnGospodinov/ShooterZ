@@ -53,19 +53,83 @@ ctx.font = '15px Arial';
 var cradius = 30;
 var playerx,playery;
 
-socket.on('newPositions',function(data){
-  ctx.clearRect(0,0,document.getElementById("ctx").width,document.getElementById("ctx").height);
+//init
+var Player = function(initPack){
+  var self = {};
+  self.id = initPack.id;
+  self.number = initPack.number;
+  self.x = initPack.x;
+  self.y = initPack.y;
+  Player.list[self.id] = self;
+  return self;
+}
+Player.list = {};
+
+var Bullet = function(initPack){
+  var self = {};
+  self.id = initPack.id;
+  self.x = initPack.x;
+  self.y = initPack.y;
+  Bullet.list[self.id] = self;
+  return self;
+}
+Bullet.list = {};
+
+socket.on('init',function(data){
+  //{ player : [{id:123,number:'1',x:0,y:0},{id:1,number:'2',x:0,y:0}], bullet: []}
   for(var i = 0 ; i < data.player.length; i++){
-    ctx.fillText(data.player[i].number,data.player[i].x-4,data.player[i].y+5);//center the name
-    ctx.beginPath();
-    ctx.arc(data.player[i].x,data.player[i].y,cradius,0,2*Math.PI);//x,y, radius, cut
-    ctx.stroke();
-    playerx = data.player[i].x;
-    playery = data.player[i].y;
+    new Player(data.player[i]);
   }
-  for(var i = 0 ; i < data.bullet.length; i++)
-    ctx.fillRect(data.bullet[i].x-5,data.bullet[i].y-5,5,5);//center the bullet
+  for(var i = 0 ; i < data.bullet.length; i++){
+    new Bullet(data.bullet[i]);
+  }
 });
+
+socket.on('update',function(data){
+  //{ player : [{id:123,x:0,y:0},{id:1,x:0,y:0}], bullet: []}
+  for(var i = 0 ; i < data.player.length; i++){
+    var pack = data.player[i];
+    var p = Player.list[pack.id];
+    if(p){
+      if(pack.x !== undefined)
+        p.x = pack.x;
+      if(pack.y !== undefined)
+        p.y = pack.y;
+    }
+  }
+  for(var i = 0 ; i < data.bullet.length; i++){
+    var pack = data.bullet[i];
+    var b = Bullet.list[data.bullet[i].id];
+    if(b){
+      if(pack.x !== undefined)
+        b.x = pack.x;
+      if(pack.y !== undefined)
+        b.y = pack.y;
+    }
+  }
+});
+
+socket.on('remove',function(data){
+  for(var i = 0; i < data.player.length; i++){
+    delete Player.list[data.player[i]];
+  }
+  for(var i = 0; i < data.bullet.length; i++){
+    delete Bullet.list[data.bullet[i]];
+  }
+})
+
+setInterval(function(){
+  ctx.clearRect(0,0,500,500);
+  for(var i in Player.list)
+    ctx.fillText(Player.list[i].number,Player.list[i].x-5,Player.list[i].y+5);//center the name
+    ctx.beginPath();
+    ctx.arc(Player.list[i].x,Player.list[i].y,cradius,0,2*Math.PI);//x,y, radius, cut
+    ctx.stroke();
+    playerx = Player.list[i].x;
+    playery = Player.list[i].y;
+  for(var i in Bullet.list)
+      ctx.fillRect(Bullet.list[i].x-5,Bullet.list[i].y-5,5,5);//center the bullet
+},40);
 
 document.onkeydown = function(event){
   if(event.keyCode === 68)    //d
