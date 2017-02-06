@@ -51,7 +51,6 @@ socket.on('signUpResponse',function(data){
 var ctx = document.getElementById("ctx").getContext("2d");
 ctx.font = '15px Arial';
 var cradius = 30;
-var playerx,playery;
 
 //init
 var Player = function(initPack){
@@ -72,8 +71,6 @@ var Player = function(initPack){
     ctx.beginPath();
     ctx.arc(self.x,self.y,cradius,0,2*Math.PI);//x,y, radius, cut
     ctx.stroke();
-    playerx = self.x;
-    playery = self.y;
   }
 
   Player.list[self.id] = self;
@@ -177,8 +174,8 @@ document.onmouseup = function(event){
   socket.emit('keyPress',{inputId:'attack',state:false});
 }
 document.onmousemove = function(event){
-  var x = -playerx + event.clientX - 8;
-  var y = -playery + event.clientY - 8;
+  var x = -250 + event.clientX - 8;
+  var y = -250 + event.clientY - 8;
   var angle = Math.atan2(y,x) / Math.PI * 180;
   socket.emit('keyPress',{inputId:'mouseAngle',state:angle});
 }
