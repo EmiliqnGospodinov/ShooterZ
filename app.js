@@ -13,11 +13,10 @@ app.get('/', function(req, res){
 serv.listen(process.env.PORT || 2000);
 console.log("Server started.");
 var SOCKET_LIST = {};
-
 var Entity = function(){
   var self = {
-    x:Math.random() * (470 - 30) + 30,
-    y:Math.random() * (470 - 30) + 30,
+    x:Math.random() * (770 - 30) + 30,
+    y:Math.random() * (770 - 30) + 30,
     spdX:0,
     spdY:0,
     id:"",
@@ -39,7 +38,7 @@ var Entity = function(){
 var Player = function(id){
   var self = Entity();
   self.id = id;
-  self.number = "" + Math.floor(10 * Math.random());
+  self.username = username;
   self.pressingRight = false;
   self.pressingLeft = false;
   self.pressingUp = false;
@@ -66,16 +65,16 @@ var Player = function(id){
   }
 
   self.updateSpd = function(){
-    if(self.pressingRight && self.x < 466)// ???? number
+    if(self.pressingRight && self.x < 765)// ???? number, radius bug??
       self.spdX = self.maxSpd;
-    else if(self.pressingLeft && self.x > 34)// ???? number
+    else if(self.pressingLeft && self.x > 35)// ???? number, radius bug??
       self.spdX = -self.maxSpd;
     else
       self.spdX = 0;
 
-    if(self.pressingUp && self.y > 34)// ???? number
+    if(self.pressingUp && self.y > 35)// ???? number, radius bug??
       self.spdY = -self.maxSpd;
-    else if(self.pressingDown && self.y < 466)// ???? number
+    else if(self.pressingDown && self.y < 765)// ???? number, radius bug??
       self.spdY = self.maxSpd;
     else
       self.spdY = 0;
@@ -86,7 +85,7 @@ var Player = function(id){
       id:self.id,
       x:self.x,
       y:self.y,
-      number:self.number,
+      username:self.username,
       hp:self.hp,
       hpMax:self.hpMax,
       score:self.score,
@@ -244,7 +243,7 @@ var addUser = function(data,cb){
         cb();
     });
 }
-
+var username;
 var io = require('socket.io')(serv,{});
 io.sockets.on('connection', function(socket){
 
@@ -252,6 +251,7 @@ io.sockets.on('connection', function(socket){
   SOCKET_LIST[socket.id] = socket;
 
   socket.on("signIn",function(data){
+    username = data.username;
     isValidPassword(data,function(res){
       if(res){
         Player.onConnect(socket);
@@ -299,4 +299,4 @@ setInterval(function(){
   initPack.bullet = [];
   removePack.player = [];
   removePack.bullet = [];
-},1000/25);
+},1000/40);

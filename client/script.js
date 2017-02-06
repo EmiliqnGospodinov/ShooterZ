@@ -49,14 +49,15 @@ socket.on('signUpResponse',function(data){
 
 //game
 var ctx = document.getElementById("ctx").getContext("2d");
-ctx.font = '15px Arial';
+ctx.font = '10px Arial';
 var cradius = 30;
+var playerx, playery;
 
 //init
 var Player = function(initPack){
   var self = {};
   self.id = initPack.id;
-  self.number = initPack.number;
+  self.username = initPack.username;
   self.x = initPack.x;
   self.y = initPack.y;
   self.hp = initPack.hp;
@@ -65,12 +66,15 @@ var Player = function(initPack){
 
   self.draw = function(){
     var hpWidth = 30* self.hp/ self.hpMax;
-    ctx.fillRect(self.x - hpWidth/2,self.y - 40, hpWidth, 4);
-    ctx.fillText(self.score,self.x,self.y - 60);
-    ctx.fillText(self.number,self.x-4,self.y+5);//center the name
+    ctx.fillText("Score: " + self.score,self.x - cradius,self.y - 43);// score
+    ctx.fillText("HP ",self.x - cradius,self.y - 35);// HP
+    ctx.fillRect(self.x - hpWidth/2,self.y - 40, hpWidth, 4);// HP
+    ctx.fillText(self.username,self.x-cradius + 1,self.y+4);// name
     ctx.beginPath();
-    ctx.arc(self.x,self.y,cradius,0,2*Math.PI);//x,y, radius, cut
+    ctx.arc(self.x,self.y,cradius,0,2*Math.PI);// circle(x,y, radius, cut(whole circle))
     ctx.stroke();
+    playerx = self.x;
+    playery = self.y;
   }
 
   Player.list[self.id] = self;
@@ -145,7 +149,7 @@ setInterval(function(){
     Player.list[i].draw();
   for(var i in Bullet.list)
     Bullet.list[i].draw();
-},40);
+},25);
 
 document.onkeydown = function(event){
   if(event.keyCode === 68)    //d
@@ -174,8 +178,8 @@ document.onmouseup = function(event){
   socket.emit('keyPress',{inputId:'attack',state:false});
 }
 document.onmousemove = function(event){
-  var x = -250 + event.clientX - 8;
-  var y = -250 + event.clientY - 8;
+  var x = -playerx + event.clientX - 8;
+  var y = -playery + event.clientY - 8;
   var angle = Math.atan2(y,x) / Math.PI * 180;
   socket.emit('keyPress',{inputId:'mouseAngle',state:angle});
 }
