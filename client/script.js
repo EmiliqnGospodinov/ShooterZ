@@ -48,6 +48,11 @@ socket.on('signUpResponse',function(data){
 
 
 //game
+var Img = {};
+Img.map = new Image();
+Img.map.src = '/client/img/Map.jpg';
+
+
 var ctx = document.getElementById("ctx").getContext("2d");
 ctx.font = '10px Arial';
 var cradius = 30;
@@ -65,11 +70,11 @@ var Player = function(initPack){
   self.score = initPack.score;
 
   self.draw = function(){
+    ctx.fillText(self.username,self.x-cradius,self.y -51);// name
     var hpWidth = 30* self.hp/ self.hpMax;
     ctx.fillText("Score: " + self.score,self.x - cradius,self.y - 43);// score
-    ctx.fillText("HP ",self.x - cradius,self.y - 35);// HP
+    ctx.fillText("HP ",self.x - cradius,self.y - 35);// HP text
     ctx.fillRect(self.x - hpWidth/2,self.y - 40, hpWidth, 4);// HP
-    ctx.fillText(self.username,self.x-cradius + 1,self.y+4);// name
     ctx.beginPath();
     ctx.arc(self.x,self.y,cradius,0,2*Math.PI);// circle(x,y, radius, cut(whole circle))
     ctx.stroke();
@@ -145,11 +150,16 @@ socket.on('remove',function(data){
 
 setInterval(function(){
   ctx.clearRect(0,0,document.getElementById("ctx").width,document.getElementById("ctx").height);
+  drawMap();
   for(var i in Player.list)
     Player.list[i].draw();
   for(var i in Bullet.list)
     Bullet.list[i].draw();
 },25);
+
+var drawMap = function(){
+  ctx.drawImage(Img.map,0,0);
+}
 
 document.onkeydown = function(event){
   if(event.keyCode === 68)    //d

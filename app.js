@@ -8,15 +8,15 @@ var mongojs = require('mongojs');
 var db = mongojs('mongodb://decisioner:gs4k56al12@ds117199.mlab.com:17199/shooterzdb', ['account','progress']);
 
 app.get('/', function(req, res){
-  res.sendFile(__dirname+'/client/index.html');
+  res.sendFile(__dirname + '/client/index.html');
 });
 serv.listen(process.env.PORT || 2000);
 console.log("Server started.");
 var SOCKET_LIST = {};
 var Entity = function(){
   var self = {
-    x:Math.random() * (770 - 30) + 30,
-    y:Math.random() * (770 - 30) + 30,
+    x:Math.random() * (870 - 60) + 60,
+    y:Math.random() * (720 - 60) + 60,
     spdX:0,
     spdY:0,
     id:"",
@@ -65,16 +65,16 @@ var Player = function(id){
   }
 
   self.updateSpd = function(){
-    if(self.pressingRight && self.x < 765)// ???? number, radius bug??
+    if(self.pressingRight && self.x < 870)// ???? number, radius bug??
       self.spdX = self.maxSpd;
-    else if(self.pressingLeft && self.x > 35)// ???? number, radius bug??
+    else if(self.pressingLeft && self.x > 60)// ???? number, radius bug??
       self.spdX = -self.maxSpd;
     else
       self.spdX = 0;
 
-    if(self.pressingUp && self.y > 35)// ???? number, radius bug??
+    if(self.pressingUp && self.y > 60)// ???? number, radius bug??
       self.spdY = -self.maxSpd;
-    else if(self.pressingDown && self.y < 765)// ???? number, radius bug??
+    else if(self.pressingDown && self.y < 720)// ???? number, radius bug??
       self.spdY = self.maxSpd;
     else
       self.spdY = 0;
@@ -173,8 +173,8 @@ var Bullet = function(parent, angle){
             if(shooter)
               shooter.score += 1;
             p.hp = p.hpMax;
-            p.x = Math.random() * (470 - 30) + 30;
-            p.y = Math.random() * (470 - 30) + 30;
+            p.x = Math.random() * (870 - 60) + 60;
+            p.y = Math.random() * (720 - 60) + 60;
           }
           self.toRemove = true;
         }
