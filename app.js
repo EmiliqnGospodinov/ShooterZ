@@ -154,15 +154,16 @@ Player.update = function(){
 var Bullet = function(parent, angle){
   var self = Entity();
   self.id = Math.random();
-  self.spdX = Math.cos(angle/180*Math.PI) * 10;
-  self.spdY = Math.sin(angle/180*Math.PI) * 10;
+  self.spdX = Math.cos(angle/180*Math.PI) * 20;
+  self.spdY = Math.sin(angle/180*Math.PI) * 20;
   self.parent = parent;
   self.timer = 0;
   self.toRemove = false;
   var super_update = self.update;
   self.update = function(){
-    if(self.timer++ > 100)
+    if(self.timer++ > 70)
       self.toRemove = true;
+      
       super_update();
       for(var i in Player.list){
         var p = Player.list[i];
@@ -221,6 +222,8 @@ Bullet.getAllInitPack = function(){
   }
   return bullets;
 }
+
+//Login checks
 
 var isValidPassword = function(data,cb){
     db.account.find({username:data.username,password:data.password},function(err,res){

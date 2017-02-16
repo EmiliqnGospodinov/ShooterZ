@@ -14,6 +14,7 @@ var signUpDivPassword = document.getElementById('signUpDiv-password');
 var signUpDivSignUp = document.getElementById('signUp');
 
 //sing in functions
+const regex = /^[a-zA-Z0-9]{3,15}$/;
 signInDivSignIn.onclick = function(){
   socket.emit('signIn',{username:signInDivUsername.value,password:signInDivPassword.value});
 }
@@ -33,9 +34,12 @@ socket.on('signInResponse',function(data){
         alert("Sign in unsuccessful.");
 });
 
-//sing in functions
+//sing up functions
 signUpDivSignUp.onclick = function(){
-  socket.emit('signUp',{username:signUpDivUsername.value,password:signUpDivPassword.value});
+  if(regex.test(signUpDivUsername.value) && regex.test(signUpDivPassword.value)){
+    socket.emit('signUp',{username:signUpDivUsername.value,password:signUpDivPassword.value});
+  } else
+    alert("Username and password should:\n-Contain charecters between A-Z, a-z or 0-9\n-Be with length between 3 and 15 characters");
 }
 socket.on('signUpResponse',function(data){
     if(data.success){
@@ -48,15 +52,8 @@ socket.on('signUpResponse',function(data){
 
 
 //game
-var Img = {};
-Img.map = new Image();
-Img.map.src = '/client/img/Map.jpg';
-
-
-var ctx = document.getElementById("ctx").getContext("2d");
-ctx.font = '10px Arial';
-var cradius = 30;
-var playerx, playery;
+var playerx,playery;
+const ctx = document.getElementById("ctx").getContext("2d");
 
 //init
 var Player = function(initPack){
@@ -69,12 +66,17 @@ var Player = function(initPack){
   self.hpMax = initPack.hpMax;
   self.score = initPack.score;
 
+  ctx.font = '10px Arial';
+  var cradius = 30;
+
   self.draw = function(){
-    ctx.fillText(self.username,self.x-cradius,self.y -51);// name
-    var hpWidth = 30* self.hp/ self.hpMax;
-    ctx.fillText("Score: " + self.score,self.x - cradius,self.y - 43);// score
+    ctx.fillText(self.username,self.x - cradius,self.y -51);// name
+    var hpWidth = 30 * self.hp/ self.hpMax;
+    ctx.fillStyle = 'red';
+    ctx.fillRect(self.x - hpWidth / 2, self.y - 40, hpWidth, 4);// HP bar
+    ctx.fillStyle = 'black';
     ctx.fillText("HP ",self.x - cradius,self.y - 35);// HP text
-    ctx.fillRect(self.x - hpWidth/2,self.y - 40, hpWidth, 4);// HP
+    ctx.fillText("Score: " + self.score,self.x - cradius,self.y - 43);// score
     ctx.beginPath();
     ctx.arc(self.x,self.y,cradius,0,2*Math.PI);// circle(x,y, radius, cut(whole circle))
     ctx.stroke();
@@ -158,8 +160,12 @@ setInterval(function(){
 },25);
 
 var drawMap = function(){
+  var Img = {};
+  Img.map = new Image();
+  Img.map.src = '/client/img/Map.jpg';
   ctx.drawImage(Img.map,0,0);
 }
+
 
 document.onkeydown = function(event){
   if(event.keyCode === 68)    //d
