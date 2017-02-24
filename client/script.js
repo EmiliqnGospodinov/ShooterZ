@@ -1,56 +1,9 @@
 var socket = io();
-//divs
-var signUpDiv = document.getElementById('signUpDiv');
-var signInDiv = document.getElementById('signInDiv');
-//sign in elements
-var signInDivUsername = document.getElementById('signInDiv-username');
-var signInDivPassword = document.getElementById('signInDiv-password');
-var signInDivSignIn = document.getElementById('signInDiv-signIn');
-var signInDivSignUp = document.getElementById('signInDiv-signUp');
-
-//sign up elements
-var signUpDivUsername = document.getElementById('signUpDiv-username');
-var signUpDivPassword = document.getElementById('signUpDiv-password');
-var signUpDivSignUp = document.getElementById('signUp');
-
-//sing in functions
-const regex = /^[a-zA-Z0-9]{3,15}$/;
-signInDivSignIn.onclick = function(){
-  socket.emit('signIn',{username:signInDivUsername.value,password:signInDivPassword.value});
-}
-signInDivSignUp.onclick = function(){
-  signInDiv.style.display = 'none';
-  signUpDiv.style.display = 'block';
-}
-signUpDivSignUp.onclick = function(){
-  signInDiv.style.display = 'none';
-  signUpDiv.style.display = 'block';
-}
-socket.on('signInResponse',function(data){
-    if(data.success){
-        signInDiv.style.display = 'none';
-        gameDiv.style.display = 'block';
-    } else
-        alert("Sign in unsuccessful.");
+var metaTag = document.getElementsByTagName("meta")[0];
+socket.emit("signIn",{
+  username: metaTag.getAttribute("content")
 });
-
-//sing up functions
-signUpDivSignUp.onclick = function(){
-  if(regex.test(signUpDivUsername.value) && regex.test(signUpDivPassword.value)){
-    socket.emit('signUp',{username:signUpDivUsername.value,password:signUpDivPassword.value});
-  } else
-    alert("Username and password should:\n-Contain charecters between A-Z, a-z or 0-9\n-Be with length between 3 and 15 characters");
-}
-socket.on('signUpResponse',function(data){
-    if(data.success){
-        signUpDiv.style.display = 'none';
-        signInDiv.style.display = 'block';
-        alert("Sign up successful, please log in");
-    } else
-        alert("Sign up unsuccessful.");
-});
-
-
+metaTag.parentNode.removeChild(metaTag);
 //game
 var playerx,playery;
 const ctx = document.getElementById("ctx").getContext("2d");
@@ -103,6 +56,10 @@ var Bullet = function(initPack){
 }
 Bullet.list = {};
 
+var currentPlayer;
+socket.on('player_id', function(data){
+  currentPlayer = data;
+});
 socket.on('init',function(data){
   //{ player : [{id:123,number:'1',x:0,y:0},{id:1,number:'2',x:0,y:0}], bullet: []}
   for(var i = 0 ; i < data.player.length; i++){
@@ -194,8 +151,8 @@ document.onmouseup = function(event){
   socket.emit('keyPress',{inputId:'attack',state:false});
 }
 document.onmousemove = function(event){
-  var x = -playerx + event.clientX - 8;
-  var y = -playery + event.clientY - 8;
+  var x = -Player.list[currentPlayer].x + event.clientX - 8;
+  var y = -Player.list[currentPlayer].y + event.clientY - 8;
   var angle = Math.atan2(y,x) / Math.PI * 180;
   socket.emit('keyPress',{inputId:'mouseAngle',state:angle});
 }
