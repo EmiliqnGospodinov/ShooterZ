@@ -75,17 +75,22 @@ var Player = function(id, username){
   self.pressingDown = false;
   self.pressingAttack = false;
   self.mouseAngle = 0;
-  self.maxSpd = 10;
-  self.hp = 10;
-  self.hpMax = 10;
+  self.maxSpd = 7;
+  self.hp = 3;
+  self.hpMax = 3;
   self.score = 0;
+  self.shootDelay = 10;
 
   var super_update = self.update;
   self.update = function(){
+    self.shootDelay++;
     self.updateSpd();
     super_update();
     if(self.pressingAttack){
-      self.shootBullet(self.mouseAngle);
+      if(self.shootDelay >= 10){
+        self.shootBullet(self.mouseAngle);
+        self.shootDelay = 0;
+      }
     }
   }
   self.shootBullet = function(angle){

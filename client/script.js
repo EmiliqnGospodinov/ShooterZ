@@ -24,7 +24,7 @@ var Player = function(initPack){
 
   self.draw = function(){
     ctx.fillText(self.username,self.x - cradius,self.y -51);// name
-    var hpWidth = 30 * self.hp/ self.hpMax;
+    var hpWidth = 100 * self.hp/ 10;
     ctx.fillStyle = 'red';
     ctx.fillRect(self.x - hpWidth / 2, self.y - 40, hpWidth, 4);// HP bar
     ctx.fillStyle = 'black';
