@@ -1,3 +1,7 @@
+//Username and password examples:
+//Username: asd ; Password: 123
+//Username: 123 ; Password: 123
+//Username: 1234 ; Password: 1234
 
 var express = require('express');
 var bodyParser = require('body-parser');
