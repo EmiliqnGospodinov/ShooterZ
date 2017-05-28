@@ -32,7 +32,16 @@ app.post('/game', urlencodedParser, function (req, res) {
   });
 });
 
-
+app.post('/register', urlencodedParser, function(req, res) {
+  isUsernameTaken(req.body, function(data){
+    addUser(data, function() {
+      req.session.username = req.body.username;
+      res.render('index', {username: req.session.username});
+    }, function() {
+      res.redirect('/');
+  });
+  });
+});
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/client/login.html');
@@ -42,7 +51,7 @@ app.get('/game', function(req, res){
     res.setHeader('Username', req.session.username);
     res.redirect('/');
   }else{
-    res.sendFile(__dirname + '/client/index.html');
+    res.sendFile(__dirname + '/client/login.html');
   }
 });
 serv.listen(process.env.PORT || 2000);
@@ -59,12 +68,12 @@ var findUser = function(data, cb, loginError){
             loginError();
     });
 }
-var isUsernameTaken = function(data,cb){
+var isUsernameTaken = function(data, cb, registerError){
     db.account.find({username:data.username},function(err,res){
         if(res.length > 0)
-            cb(true);
+          registerError();
         else
-            cb(false);
+          cb(data);
     });
 }
 var addUser = function(data,cb){

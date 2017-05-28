@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <script src="client/login.js" charset="utf-8"></script>
 </head>
 <body>
   <div id="signInDiv" style="display: block;">
@@ -11,10 +12,10 @@
     </form>
     <button id="openRegForm">Register</button>
   </div>
-  <div id="RegisterDiv" style="display: block;">
+  <div id="RegisterDiv" style="display: none">
     <form method="post" action="/register">
-      Your username: <input id="signUpDiv-username" type="text"></input><br>
-      Password: <input id="signUpDiv-password" type="password"></input>
+      <label for="username">Your username: </label><input id="signUpDiv-username" type="text" name="username"></input><br>
+      <label for="password">Password: </label><input id="signUpDiv-password" type="password" name="password"></input>
       <input type="submit" value="Register New User" id="Register"></input>
     </form>
   </div>
